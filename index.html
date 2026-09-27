@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASFAK CYBER WORLD</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  background:#020506;
+  color:#00ff9d;
+  font-family:monospace;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+canvas{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:-2;
+}
+
+.overlay{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(
+    rgba(0,255,150,.04),
+    rgba(0,0,0,.35)
+  );
+  pointer-events:none;
+  z-index:-1;
+}
+
+.container{
+  width:92%;
+  max-width:700px;
+  margin:35px auto;
+  border:2px solid #00ff9d;
+  padding:22px;
+  background:rgba(0,15,15,.82);
+  box-shadow:
+    0 0 15px #00ff9d,
+    inset 0 0 25px rgba(0,255,157,.12);
+}
+
+h1{
+  text-align:center;
+  font-size:30px;
+  color:#00ff9d;
+  text-shadow:0 0 12px #00ff9d;
+  margin-bottom:8px;
+}
+
+.subtitle{
+  text-align:center;
+  color:#ff4df8;
+  margin-bottom:25px;
+}
+
+.status{
+  border:1px solid #00ff9d;
+  padding:14px;
+  margin-bottom:20px;
+  text-align:center;
+}
+
+.status span{
+  color:#00ff9d;
+  font-weight:bold;
+}
+
+.panel{
+  border:1px solid #147a62;
+  padding:18px;
+  margin-top:18px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  margin:12px 0;
+  color:#9affd8;
+}
+
+.bar{
+  width:100%;
+  height:10px;
+  background:#06241c;
+  border:1px solid #00ff9d;
+  margin-top:6px;
+  overflow:hidden;
+}
+
+.fill{
+  height:100%;
+  width:45%;
+  background:#00ff9d;
+  box-shadow:0 0 10px #00ff9d;
+  transition:width .5s;
+}
+
+button{
+  width:100%;
+  padding:18px;
+  margin-top:15px;
+  border:2px solid #00ff9d;
+  background:#03140f;
+  color:#00ff9d;
+  font-family:monospace;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 0 10px rgba(0,255,157,.3);
+}
+
+button:active{
+  transform:scale(.97);
+}
+
+#chaosBtn{
+  border-color:#ff3cf7;
+  color:#ff8dfb;
+}
+
+#log{
+  height:180px;
+  overflow-y:auto;
+  border:1px solid #147a62;
+  padding:12px;
+  margin-top:18px;
+  background:#010806;
+  font-size:13px;
+  line-height:1.7;
+}
+
+.logline{
+  color:#65ffc7;
+}
+
+.warning{
+  color:#ff4d6d;
+}
+
+.chaos{
+  color:#ff55f7;
+}
+
+.footer{
+  text-align:center;
+  margin-top:25px;
+  color:#ff8dfb;
+}
+
+body.chaosMode{
+  background:#08000a;
+}
+
+body.chaosMode .container{
+  border-color:#ff35f5;
+  box-shadow:
+    0 0 25px #ff35f5,
+    inset 0 0 30px rgba(255,53,245,.15);
+}
+
+body.chaosMode h1{
+  color:#ff35f5;
+  text-shadow:0 0 15px #ff35f5;
+}
+
+body.chaosMode .fill{
+  background:#ff35f5;
+  box-shadow:0 0 15px #ff35f5;
+}
+
+body.chaosMode button{
+  border-color:#ff35f5;
+  color:#ff8dfb;
+}
+
+.flash{
+  animation:flash .35s;
+}
+
+@keyframes flash{
+  0%{filter:brightness(3);}
+  100%{filter:brightness(1);}
+}
+
+@media(max-width:500px){
+  h1{
+    font-size:23px;
+  }
+
+  .container{
+    margin:20px auto;
+    padding:15px;
+  }
+
+  button{
+    font-size:16px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+<div class="overlay"></div>
+
+<div class="container">
+
+  <h1>⚠ ASFAK CYBER WORLD ⚠</h1>
+
+  <div class="subtitle">
+    DIGITAL LAB // FUTURE MODE
+  </div>
+
+  <div class="status">
+    SYSTEM STATUS:
+    <span id="status">NORMAL</span>
+  </div>
+
+  <div class="panel">
+
+    <div class="row">
+      <span>CORE POWER</span>
+      <span id="powerText">45%</span>
+    </div>
+
+    <div class="bar">
+      <div class="fill" id="powerBar"></div>
+    </div>
+
+    <div class="row">
+      <span>SECURITY</span>
+      <span id="security">ACTIVE</span>
+    </div>
+
+    <div class="row">
+      <span>NETWORK</span>
+      <span id="network">ONLINE</span>
+    </div>
+
+  </div>
+
+  <button id="chaosBtn">
+    ⚡ ACTIVATE CHAOS MODE
+  </button>
+
+  <button id="normalBtn">
+    NORMAL MODE
+  </button>
+
+  <div id="log">
+    <div class="logline">[SYSTEM] Cyber interface loaded...</div>
+    <div class="logline">[SYSTEM] Waiting for command...</div>
+  </div>
+
+  <div class="footer">
+    ASFAK // CYBER WORLD
+  </div>
+
+</div>
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let w;
+let h;
+let stars = [];
+let chaos = false;
+
+function resize(){
+
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+
+  stars = [];
+
+  for(let i = 0; i < 140; i++){
+
+    stars.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      size: Math.random() * 2 + 1,
+      speed: Math.random() * 1.5 + .3
+    });
+
+  }
+}
+
+function draw(){
+
+  ctx.clearRect(0,0,w,h);
+
+  ctx.fillStyle = chaos
+    ? "rgba(255,0,180,.75)"
+    : "rgba(0,255,157,.75)";
+
+  for(let star of stars){
+
+    ctx.fillRect(
+      star.x,
+      star.y,
+      star.size,
+      star.size
+    );
+
+    star.y += chaos
+      ? star.speed * 4
+      : star.speed;
+
+    if(star.y > h){
+      star.y = 0;
+      star.x = Math.random() * w;
+    }
+
+  }
+
+  requestAnimationFrame(draw);
+}
+
+resize();
+draw();
+
+window.addEventListener("resize", resize);
+
+
+/* LOG SYSTEM */
+
+const logBox = document.getElementById("log");
+
+function addLog(message, type = "logline"){
+
+  const line = document.createElement("div");
+
+  line.className = type;
+
+  const time = new Date().toLocaleTimeString();
+
+  line.textContent = "[" + time + "] " + message;
+
+  logBox.appendChild(line);
+
+  logBox.scrollTop = logBox.scrollHeight;
+
+}
+
+
+/* CHAOS MODE */
+
+document.getElementById("chaosBtn").addEventListener("click", function(){
+
+  chaos = true;
+
+  document.body.classList.add("chaosMode");
+  document.body.classList.add("flash");
+
+  document.getElementById("status").textContent =
+    "CHAOS ACTIVE";
+
+  document.getElementById("security").textContent =
+    "HIGH";
+
+  document.getElementById("network").textContent =
+    "BOOSTED";
+
+  document.getElementById("powerText").textContent =
+    "100%";
+
+  document.getElementById("powerBar").style.width =
+    "100%";
+
+  addLog(
+    "CHAOS MODE ACTIVATED",
+    "chaos"
+  );
+
+  addLog(
+    "Visual systems boosted...",
+    "chaos"
+  );
+
+  addLog(
+    "Simulation running...",
+    "chaos"
+  );
+
+  setTimeout(function(){
+
+    document.body.classList.remove("flash");
+
+  },350);
+
+});
+
+
+/* NORMAL MODE */
+
+document.getElementById("normalBtn").addEventListener("click", function(){
+
+  chaos = false;
+
+  document.body.classList.remove("chaosMode");
+
+  document.getElementById("status").textContent =
+    "NORMAL";
+
+  document.getElementById("security").textContent =
+    "ACTIVE";
+
+  document.getElementById("network").textContent =
+    "ONLINE";
+
+  document.getElementById("powerText").textContent =
+    "45%";
+
+  document.getElementById("powerBar").style.width =
+    "45%";
+
+  addLog(
+    "Returned to NORMAL MODE"
+  );
+
+});
+
+
+/* RANDOM SYSTEM LOGS */
+
+setInterval(function(){
+
+  if(chaos){
+
+    const messages = [
+      "Scanning visual matrix...",
+      "Energy level increasing...",
+      "Cyber interface synchronized...",
+      "Particle engine boosted...",
+      "Chaos animation running..."
+    ];
+
+    const random =
+      messages[Math.floor(Math.random() * messages.length)];
+
+    addLog(random,"chaos");
+
+  }
+
+},2500);
+
+</script>
+
+</body>
+</html>
